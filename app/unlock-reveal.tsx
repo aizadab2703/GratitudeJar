@@ -8,26 +8,21 @@ import {
   Easing,
   ScrollView,
   Platform,
-  Share,
-  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Gift, Share2, RotateCcw, Heart, Sparkles } from 'lucide-react-native';
+import { RotateCcw, Heart, Sparkles } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useGratitude } from '@/providers/GratitudeProvider';
 import { formatDateShort, getDurationLabel, triggerHaptic } from '@/utils/helpers';
 import GoldenParticles from '@/components/GoldenParticles';
 import JarVisualization from '@/components/JarVisualization';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
 export default function UnlockRevealScreen() {
   const { jarId } = useLocalSearchParams<{ jarId: string }>();
-  const { getNotesForJar, unlockJar, jars } = useGratitude();
+  const { getNotesForJar, jars } = useGratitude();
   const [phase, setPhase] = useState<'shake' | 'open' | 'notes'>('shake');
   const [showParticles, setShowParticles] = useState<boolean>(false);
-  const [revealedNotes, setRevealedNotes] = useState<number>(0);
 
   const jar = jars.find((j) => j.id === jarId);
   const jarNotes = jarId ? getNotesForJar(jarId) : [];
@@ -115,33 +110,13 @@ export default function UnlockRevealScreen() {
       ])
     );
     Animated.parallel(animations).start();
-    let count = 0;
-    const interval = setInterval(() => {
-      count++;
-      setRevealedNotes(count);
-      if (count >= jarNotes.length) clearInterval(interval);
-    }, 350);
+
   }, [noteAnims, jarNotes.length]);
 
   const shakeTranslate = shakeAnim.interpolate({
     inputRange: [0, 0.08, 0.16, 0.24, 0.32, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
     outputRange: [0, -10, 10, -10, 10, -7, 7, -5, 5, -3, 2, 0],
   });
-
-  const handleShare = async () => {
-    if (!jar) return;
-    triggerHaptic('light');
-    const preview = jarNotes
-      .slice(0, 3)
-      .map((n) => `"${n.text}"`)
-      .join('\n');
-    const message = `My GratitudeJar (${getDurationLabel(jar.durationMinutes)})\n${jarNotes.length} notes of gratitude\n\n${preview}\n\nTry GratitudeJar!`;
-    try {
-      await Share.share({ message });
-    } catch (e) {
-      console.log('[UnlockReveal] Share error:', e);
-    }
-  };
 
   const handleNewJar = () => {
     triggerHaptic('medium');
@@ -275,16 +250,6 @@ export default function UnlockRevealScreen() {
             ))}
 
             <View style={styles.bottomActions}>
-              <TouchableOpacity
-                style={styles.shareButton}
-                onPress={handleShare}
-                activeOpacity={0.8}
-                testID="share-recap"
-              >
-                <Share2 color={Colors.terracotta} size={17} />
-                <Text style={styles.shareText}>Share recap</Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.newJarButton}
                 onPress={handleNewJar}
@@ -432,22 +397,6 @@ const styles = StyleSheet.create({
     marginTop: 28,
     gap: 14,
     paddingBottom: 20,
-  },
-  shareButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 16,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: Colors.terracotta,
-    backgroundColor: Colors.cardBg,
-  },
-  shareText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: Colors.terracotta,
   },
   newJarButton: {
     borderRadius: 20,

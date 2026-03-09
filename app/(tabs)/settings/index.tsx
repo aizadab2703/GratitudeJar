@@ -6,18 +6,16 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
-  Switch,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, router } from 'expo-router';
-import { User, Bell, LogOut, Shield, Heart, Sparkles } from 'lucide-react-native';
+import { User, LogOut, Heart, Sparkles } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useGratitude } from '@/providers/GratitudeProvider';
 import { triggerHaptic } from '@/utils/helpers';
 
 export default function SettingsScreen() {
   const { user, signOut, jars, notes } = useGratitude();
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState<boolean>(true);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -72,38 +70,7 @@ export default function SettingsScreen() {
                   </View>
                 </View>
               </View>
-              <View style={styles.divider} />
-              <View style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(212, 162, 78, 0.1)' }]}>
-                    <Shield color={Colors.honey} size={17} />
-                  </View>
-                  <View>
-                    <Text style={styles.rowLabel}>Signed in with</Text>
-                    <Text style={styles.rowSubtext}>Email</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
-            <View style={styles.card}>
-              <View style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(212, 162, 78, 0.1)' }]}>
-                    <Bell color={Colors.honey} size={17} />
-                  </View>
-                  <Text style={styles.rowLabel}>Notifications</Text>
-                </View>
-                <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
-                  trackColor={{ false: '#D4D0CC', true: Colors.terracottaLight }}
-                  thumbColor={notificationsEnabled ? Colors.terracotta : '#F5F3F0'}
-                />
-              </View>
             </View>
           </View>
 
