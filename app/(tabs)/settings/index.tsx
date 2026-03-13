@@ -8,28 +8,27 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, router } from 'expo-router';
-import { User, LogOut, Heart, Sparkles } from 'lucide-react-native';
+import { Stack } from 'expo-router';
+import { Heart, Sparkles, Trash2 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { useGratitude } from '@/providers/GratitudeProvider';
 import { triggerHaptic } from '@/utils/helpers';
 
 export default function SettingsScreen() {
-  const { user, signOut, jars, notes } = useGratitude();
+  const { jars, notes, clearAllData } = useGratitude();
 
-  const handleSignOut = () => {
+  const handleClearData = () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out? Your data will be cleared from this device.',
+      'Clear All Data',
+      'Are you sure? This will permanently delete all your jars and notes.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Sign Out',
+          text: 'Delete Everything',
           style: 'destructive',
           onPress: () => {
             triggerHaptic('medium');
-            signOut();
-            router.replace('/onboarding');
+            void clearAllData();
           },
         },
       ]
@@ -57,24 +56,6 @@ export default function SettingsScreen() {
       >
         <View style={styles.content}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account</Text>
-            <View style={styles.card}>
-              <View style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <View style={[styles.iconBox, { backgroundColor: Colors.roseSoft }]}>
-                    <User color={Colors.terracotta} size={17} />
-                  </View>
-                  <View>
-                    <Text style={styles.rowLabel}>{user?.name || 'User'}</Text>
-                    <Text style={styles.rowSubtext}>{user?.email || ''}</Text>
-                  </View>
-                </View>
-              </View>
-
-            </View>
-          </View>
-
-          <View style={styles.section}>
             <Text style={styles.sectionTitle}>Your Journey</Text>
             <View style={styles.statsRow}>
               <View style={styles.statCard}>
@@ -90,15 +71,18 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={handleSignOut}
-            activeOpacity={0.7}
-            testID="sign-out-button"
-          >
-            <LogOut color={Colors.danger} size={17} />
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Data</Text>
+            <TouchableOpacity
+              style={styles.dangerButton}
+              onPress={handleClearData}
+              activeOpacity={0.7}
+              testID="clear-data-button"
+            >
+              <Trash2 color={Colors.danger} size={17} />
+              <Text style={styles.dangerButtonText}>Clear All Data</Text>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.footer}>
             <Heart color={Colors.roseGold} size={13} fill={Colors.roseGold} />
@@ -130,47 +114,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 4,
   },
-  card: {
-    backgroundColor: Colors.cardBg,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: Colors.cardBorder,
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  rowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rowLabel: {
-    fontSize: 16,
-    fontWeight: '500' as const,
-    color: Colors.textPrimary,
-  },
-  rowSubtext: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    marginTop: 1,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(194, 120, 92, 0.06)',
-    marginHorizontal: 16,
-  },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -197,7 +140,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase' as const,
     letterSpacing: 0.5,
   },
-  signOutButton: {
+  dangerButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -207,9 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(196, 75, 75, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(196, 75, 75, 0.1)',
-    marginTop: 8,
   },
-  signOutText: {
+  dangerButtonText: {
     fontSize: 16,
     fontWeight: '600' as const,
     color: Colors.danger,

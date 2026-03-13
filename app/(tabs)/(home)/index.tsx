@@ -19,18 +19,18 @@ import { getCountdownText, isJarUnlockable, triggerHaptic } from '@/utils/helper
 import JarVisualization from '@/components/JarVisualization';
 import AmbientParticles from '@/components/AmbientParticles';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { getActiveJar, getNotesForJar, user, isReady } = useGratitude();
+  const { getActiveJar, getNotesForJar, isReady, hasOnboarded } = useGratitude();
 
   useEffect(() => {
-    if (isReady && !user) {
-      console.log('[Home] No user found, redirecting to onboarding');
+    if (isReady && !hasOnboarded) {
+      console.log('[Home] Not onboarded, redirecting to onboarding');
       router.replace('/onboarding');
     }
-  }, [isReady, user]);
+  }, [isReady, hasOnboarded]);
 
   const activeJar = getActiveJar();
   const jarNotes = activeJar ? getNotesForJar(activeJar.id) : [];
@@ -113,7 +113,7 @@ export default function HomeScreen() {
         useNativeDriver: false,
       }).start();
     }
-  }, [activeJar, countdown]);
+  }, [activeJar, countdown, progressAnim]);
 
   useEffect(() => {
     if (isUnlockable) {
@@ -260,7 +260,7 @@ export default function HomeScreen() {
           ]}
         >
           <Text style={styles.greeting}>
-            {getGreeting()}{user?.name ? `, ${user.name}` : ''}
+            {getGreeting()}
           </Text>
           <View style={styles.greetingMeta}>
             <View style={styles.notesBadge}>
